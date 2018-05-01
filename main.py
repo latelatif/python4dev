@@ -1,5 +1,5 @@
 import pandas as pd
-import numpy as np
+from datetime import datetime
 import matplotlib.pyplot as plott
 
 
@@ -56,51 +56,51 @@ def create_genre_pie_chart(data):
 
 def create_rating_to_price(data):
     rating_to_price = plott.scatter(data['PriceInitial'], data['Metacritic'])
-    plott.xlabel("Price in USD")
-    plott.ylabel("Mean Rating")
+    plott.xlabel('Price in USD')
+    plott.ylabel('Mean Rating')
     plott.xlim((0, 80))
     plott.ylim(20, 100)
-    plott.savefig("./rating_to_price.png", bbox_inches='tight')
+    plott.savefig('./rating_to_price.png', bbox_inches='tight')
     plott.close()
 
 
 def create_recommendation_to_price(data):
     recommendation_to_price = plott.scatter(data['PriceInitial'], data['RecommendationCount'])
-    plott.xlabel("Price in USD")
-    plott.ylabel("Recommendation count")
+    plott.xlabel('Price in USD')
+    plott.ylabel('Recommendation count')
     plott.xlim((0, 100))
     plott.ylim((100,200000))
-    plott.savefig("./recommendation_to_price.png", bbox_inches='tight')
+    plott.savefig('./recommendation_to_price.png', bbox_inches='tight')
     plott.close()
 
 
 def create_player_count_to_price(data):
     player_count_to_price = plott.scatter(data['PriceInitial'], data['SteamSpyPlayersEstimate'])
-    plott.xlabel("Price in USD")
-    plott.ylabel("Player count")
+    plott.xlabel('Price in USD')
+    plott.ylabel('Player count')
     plott.xlim((0, 100))
     plott.ylim((0, 5000000))
-    plott.savefig("./player_count_to_price.png", bbox_inches='tight')
+    plott.savefig('./player_count_to_price.png', bbox_inches='tight')
     plott.close()
 
 
 def create_player_count_to_recommendation(data):
     create_player_count_to_recommendation = plott.scatter(data['RecommendationCount'], data['SteamSpyPlayersEstimate'])
-    plott.xlabel("Recommendation count")
-    plott.ylabel("Player count")
+    plott.xlabel('Recommendation count')
+    plott.ylabel('Player count')
     plott.xlim((0, 200000))
     plott.ylim((0, 5000000))
-    plott.savefig("./player_count_to_recommendation.png", bbox_inches='tight')
+    plott.savefig('./player_count_to_recommendation.png', bbox_inches='tight')
     plott.close()
 
 
 def create_player_count_to_rating(data):
     create_player_count_to_rating = plott.scatter(data['Metacritic'], data['SteamSpyPlayersEstimate'])
-    plott.xlabel("Ratings")
-    plott.ylabel("Player count")
+    plott.xlabel('Ratings')
+    plott.ylabel('Player count')
     plott.xlim((1, 100))
     plott.ylim((0, 5000000))
-    plott.savefig("./player_count_to_rating.png", bbox_inches='tight')
+    plott.savefig('./player_count_to_rating.png', bbox_inches='tight')
     plott.close()
 
 
@@ -116,19 +116,45 @@ def search(data):
     main(data)
 
 def recommend(data):
-    print('1. Give recommendation by your game habit')
-    print('2. Give recommendation by specific game type')
+    print('1. Give recommendation by specific game type')
     print('0. Return to previous menu')
     val = input('please select: ')
 
     if val == '0':
         main(data)
     elif val == '1':
-        # TODO
-        pass
-    elif val == '2':
-        pass
-        # TODO
+        print('1. Type "NonGame" for non game genre')
+        print('2. Type "Indie" for indie genre')
+        print('3. Type "Action" for action genre')
+        print('4. Type "Adventure" for adventure genre')
+        print('5. Type "Casual" for casual genre')
+        print('6. Type "Strategy" for strategy genre')
+        print('7. Type "RPG" for role playing genre')
+        print('8. Type "Simulation" for simulation genre')
+        print('9. Type "EarlyAccess" for early access genre')
+        print('10. Type "FreeToPlay" for free to play genre')
+        print('11. Type "Sports" for sports genre')
+        print('12. Type "Racing" for racing genre')
+        print('13. Type "MassivelyMultiplayer" for massively multiplayer genre')
+        print('0. Return to previous menu')
+        choice = input('Please select one: ')
+        rows = input('Please select the number of games you want to limit your results to: ')
+        rows = int(rows)
+        if choice == '0':
+            recommend(data)
+        genre_string = 'GenreIs' + choice
+        temp = data[data[genre_string] == True]
+        t = temp.sort_values(by=['Metacritic'], ascending=False)
+        res = t.head(rows)[['Name', 'Metacritic', 'ReleaseDate']]
+        print('\n\n\nThe top {} games ranked by ratings are: '.format(rows))
+        print(res)
+        print('\n\n\nThe top {} new matching games are: '.format(rows))
+        temp = temp[temp['ReleaseDate'] != '']
+        temp['ReleaseDate'] = pd.to_datetime(temp.ReleaseDate, errors='coerce')
+        temp = temp[temp['ReleaseDate'] < datetime.today()]
+        t = temp.sort_values(by=['ReleaseDate'], ascending=False)
+        res = t.head(rows)[['Name', 'Metacritic', 'ReleaseDate']]
+        print(res)
     else:
         print('Invalid input, please select again: ')
         recommend(data)
